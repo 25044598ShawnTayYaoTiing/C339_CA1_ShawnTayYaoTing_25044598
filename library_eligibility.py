@@ -6,4 +6,4 @@ def can_borrow(active_loans, overdue_books):
     if active_loans < 0 or overdue_books < 0:
         raise ValueError("argument outside permitted range")
         
-    return active_loans < 5 and overdue_books == 0
+    return active_loans <= 5 and overdue_books == 0
