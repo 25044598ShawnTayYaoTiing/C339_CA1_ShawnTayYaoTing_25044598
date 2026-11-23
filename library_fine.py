@@ -6,4 +6,4 @@ def calculate_fine(days_overdue):
     if days_overdue < 0:
         raise ValueError("argument outside permitted range")
         
-    return min(days_overdue, 10) * 50
+    return days_overdue * 50

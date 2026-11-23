@@ -1,32 +1,61 @@
+
+# Workflow name displayed in the GitHub Actions tab
 name: Run Pytest
 
+# Define when the workflow should execute
 on:
+  # Automatically trigger when changes are pushed to GitHub
   push:
+
+    # ENHANCEMENT 1: PATH FILTERING
+    # Only trigger when relevant Python files or workflow files change
+    # Prevents unnecessary CI runs for unrelated changes (e.g. README)
     paths:
-      - 'library_fine.py'
-      - 'library_eligibility.py'
-      - 'tests/**/*.py'
-      - '.github/workflows/pytest.yml'
+      - 'library_fine.py'            # Library Fine source code
+      - 'library_eligibility.py'     # Library Eligibility source code
+      - 'tests/**/*.py'             # Python test files
+      - '.github/workflows/pytest.yml' # Workflow configuration
+
+  # Allow manual execution using the "Run workflow" button
   workflow_dispatch:
 
+# ENHANCEMENT 2: CONCURRENCY CONTROL
+# Prevent outdated workflow runs from wasting resources
 concurrency:
+
+  # Group workflow runs by workflow name and Git branch/reference
   group: ${{ github.workflow }}-${{ github.ref }}
+
+  # Cancel an older running workflow if a newer run starts
+  # in the same concurrency group
   cancel-in-progress: true
 
+# Define the jobs to execute
 jobs:
   test:
+    # Run the tests on a GitHub-hosted Ubuntu computer
     runs-on: ubuntu-latest
+
+    # Execute the following steps in order
     steps:
+
+      # STEP 1: Download the repository code to the runner
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # STEP 2: Set up Python version 3.12
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
+      # STEP 3: Install pytest to run the unit tests
       - name: Install pytest
         run: python -m pip install pytest
 
+      # STEP 4: Execute all pytest test scenarios
+      # -v displays detailed results for each test scenario
+      # Expected: 28 scenarios, 25 passed, 3 failed
+      # The failures identify defects in the supplied application
       - name: Run pytest
         run: python -m pytest -v
